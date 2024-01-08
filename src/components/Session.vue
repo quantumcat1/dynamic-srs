@@ -9,7 +9,6 @@
     :scaleIndex="scale - 1"
     @new-rating="(scaleIndex) => newRating(scaleIndex)"
   />
-  <!--@new-rating="$emit('new-rating', (scale - 1))"-->
 </template>
 
 <script setup>
@@ -20,7 +19,6 @@ import { useRating } from "@/composables/Rating";
 const emit = defineEmits(["newRating"]);
 const rating = reactive(useRating());
 
-//for testing only
 const newRating = (scaleIndex) => {
   emit("newRating", scaleIndex);
 };

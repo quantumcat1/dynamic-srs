@@ -6,9 +6,7 @@
   </div>
 </template>
 
-<!--<script setup>-->
 <script>
-//TODO: when there are sessions skipped, the line does not connect - maybe need to remove null rating items and session numbers that don't exist from the dataset (computed) before it is sent to the line component
 import { Line } from "vue-chartjs";
 import { reactive, ref, defineExpose, computed } from "vue";
 import {

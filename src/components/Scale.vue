@@ -284,12 +284,7 @@ const getNewRatings = () => {
 };
 
 const clickLeft = () => {
-  if (
-    /*typeof ratings.value[rating.currentSessionIndex] !== "undefined" &&
-    ratings.value[rating.currentSessionIndex] !== null*/
-    doesRatingExist()
-  )
-    return; //only if we don't already have a rating for this session
+  if (doesRatingExist()) return; //only if we don't already have a rating for this session
   var foundLeft = false;
   var smallest = null; //'smallest' will be the index for the 'right' parameter of the new rating (if there are no ratings in the first third)
   if (ratings.value.length > 0) {
@@ -509,7 +504,6 @@ const better = () => {
     } else {
       rightMost.value = -1;
     }
-    //} else if (isLargest(selectedRatingIndex.value)) {
   } else if (next == -1) {
     rightMost.value = -1;
     addNewRating();
@@ -532,7 +526,6 @@ const worse = () => {
     } else {
       leftMost.value = -1;
     }
-    //} else if (isSmallest(selectedRatingIndex.value)) {
   } else if (next == -1) {
     leftMost.value = -1;
     addNewRating();

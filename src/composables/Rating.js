@@ -1,7 +1,5 @@
 
 import * as fractions from "../utils/fractions.js"
-import * as q from "../utils/format.js"
-//import { useFraction } from "./Fraction"
 import { ref, reactive, watch } from 'vue'
 
 //at some point can separate these out into their own composables - they don't need to all be in the one, since the data is now separated
@@ -23,8 +21,6 @@ scales.set(0, {title: "Relationship", leftText: "I did not feel heard, understoo
 scales.set(1, {title: "Goals and Topics", leftText: "We did not work on or talk about what I wanted to work on or talk about.", rightText: "We worked on and talked about what I wanted to work on or talk about."});
 scales.set(2, {title: "Approach or Method", leftText: "The therapist's approach is not a good fit for me.", rightText: "The therapist's approach is a good fit for me."});
 scales.set(3, {title: "Overall", leftText: "There was something missing in the session today.", rightText: "Overall, today's session was right for me."});
-/*ratings.set({session: 1, scale: 1, index: 0}, {fraction: fractions.simplify({n: 1, d: 2}), left: null, right: 1, clientNote: "test client note", therapistNote: "test therapist note"});
-ratings.set({session: 1, scale: 1, index: 1}, {fraction: fractions.simplify({n: 3, d: 4}), left: 0, right: null, clientNote: "test client note 2", therapistNote: "test therapist note 2"});*/
 ratings.set({scale: 1, index: 0}, {fraction: fractions.simplify({n: 1, d: 2}), left: null, right: 1, clientNote: "test client note", therapistNote: "test therapist note"});
 ratings.set({scale: 1, index: 1}, {fraction: fractions.simplify({n: 3, d: 4}), left: 0, right: null, clientNote: "test client note 2", therapistNote: "test therapist note 2"});
 
@@ -36,19 +32,11 @@ const currentSessionIndex = ref(0); //integer index for a session in the array
 
 export function useRating() {
 
-  //console.log("after defining variables in Rating - currentSession = " + q.q(currentSession.value));
-
   const refreshData = () => {
     currentSession.value = sessions.get(currentSessionIndex.value);
     numberSessions.value = sessions.size;
     arrayScales.value = [...scales.values()];
     numberScales.value = scales.size;
-
-    // console.log("after refreshData in Rating");
-    // console.log("currentSessionIndex = " + currentSessionIndex.value);
-    // console.log("currentSession = " + q.q(currentSession.value));
-    // console.log("numberSessions = " + numberSessions.value);
-    // console.log("arrayScales = " + q.q(arrayScales.value));
   }
 
   watch(currentSessionIndex, (newVal, oldVal) => {
@@ -68,17 +56,14 @@ export function useRating() {
       sessions.set(numberSessions.value, {sessionNote: ""});
     }
     currentSessionIndex.value ++;
-    //refreshData();//should do this automatically because of ther 'watch' so we don't need this
   }
 
   function previousSession() {
     if(currentSessionIndex.value > 0) {
       currentSessionIndex.value --;
     }
-    //refreshData();//should do this automatically because of ther 'watch' so we don't need this
   }
   function getScaleRating(scaleIndex, ratingIndex) {
-    //var temp = [...ratings].filter(item => item[0].session == currentSessionIndex.value && item[0].scale == scaleIndex && item[0].index == ratingIndex);
     var temp = [...ratings].filter(item => item[0].scale == scaleIndex && item[0].index == ratingIndex);
     if(temp.length > 0) {
       return temp[0][1];
@@ -94,9 +79,6 @@ export function useRating() {
     return scales.get(scaleIndex);
   }
   function getScaleRatings(scaleIndex) {
-    //return [...ratings].filter(item => item[0].scale == scaleIndex && item[0].session == currentSessionIndex.value).map(item => item[1]);
-    //return [...ratings].filter(item => item[0].scale == scaleIndex).map(item => item[1]);
-
     var temp = [...ratings.entries()].filter(item => item[0].scale == scaleIndex).sort((a, b) => a[0].index > b[0].index);//.map(item => item[1]);
 
     //just in case there are missing sessions in the middle:
@@ -114,7 +96,6 @@ export function useRating() {
 
   function updateNote(scaleIndex, ratingIndex, isClient, note) {
     for (let [key, value] of ratings) {
-      //if(key.session == currentSessionIndex.value && key.scale == scaleIndex && key.index == ratingIndex) {
         if(key.scale == scaleIndex && key.index == ratingIndex) {
         var rating = value;
         isClient ? rating.clientNote = note : rating.therapistNote = note;
@@ -129,7 +110,6 @@ export function useRating() {
     console.log("in addToRight for rating index " + ratingIndex);
     var right = null;
     for (let [key, value] of ratings) {
-      //if(key.session == currentSessionIndex.value && key.scale == scaleIndex && key.index == ratingIndex) {
         if(key.scale == scaleIndex && key.index == ratingIndex) {
         var rating = value;
         right = rating.right;
@@ -198,16 +178,12 @@ export function useRating() {
     //scaleIndex, leftMost, rightMost are integer indices
     //isMuchBetter, isMuchWorse are booleans
 
-    //what if there are no ratings yet?
-    //answer - use other function, too hard to put it here
-
     var leftRating = leftMost >= 0 ? getScaleRating(scaleIndex, leftMost) : {fraction: {n: 0, d: 1}};
     var rightRating = rightMost >= 0 ? getScaleRating(scaleIndex, rightMost) : {fraction: {n: 1, d: 1}};
 
 
 
     if(leftMost == rightMost) { //picked 'similar'
-      //var aKey = {session: currentSessionIndex.value, scale: scaleIndex, index: (greatestRatingIndex(scaleIndex) + 1)};
       var sameRating = {
         fraction: leftRating.fraction,
         left: leftMost,
@@ -217,14 +193,13 @@ export function useRating() {
       }
 
       ratings.set(newKey, sameRating);
-      return; //newKey.index; //don't need to do anything else
+      return;
     }
 
 
 
     //1. get distance between the points
     var distance = fractions.subtract(rightRating.fraction, leftRating.fraction);
-    //console.log("distance = " + q.q(distance));
 
     //2. a) if one option is 'much', add half this distance to all points on the right
     //   b) if both options are 'much' add 100% this distance
@@ -239,9 +214,7 @@ export function useRating() {
 
     var newFraction = rightRating.fraction;
 
-    //console.log("addAmt = " + q.q(addAmt) + " and ratings before we addRight: " + q.q(getScaleRatings(scaleIndex)));
     if(addAmt.n > 0) addToRight(addAmt, scaleIndex, rightMost);
-    //console.log("Ratings after we addRight: " + q.q(getScaleRatings(scaleIndex)));
 
     //3. place new rating: Where do we place new point?
     //   a) If 'much better' = always where the rightmost point was originally (doesn't matter about much worse).
@@ -255,7 +228,6 @@ export function useRating() {
       newFraction = fractions.add(leftRating.fraction, halfDistance);
     }
 
-    //console.log("key for new rating = " + q.q(newKey));
     var newRating = {
       fraction: newFraction,
       left: leftMost,
@@ -265,7 +237,6 @@ export function useRating() {
     }
 
     ratings.set(newKey, newRating);
-    //console.log("ratings after we add in the new rating: " + q.q(getScaleRatings(scaleIndex)));
 
     //4. Update left and right for the leftMost and rightMost ratings (to the new rating)
     for (let [key, value] of ratings) {
@@ -298,8 +269,7 @@ export function useRating() {
         }
       })
     }
-    //console.log("ratings after we scale: " + q.q(getScaleRatings(scaleIndex)));
-    return;// newKey.index;
+    return;
   }
 
   return {
@@ -321,5 +291,4 @@ export function useRating() {
     newMiddleRating,
     refreshData
   }
-
 }
