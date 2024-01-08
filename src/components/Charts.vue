@@ -1,7 +1,9 @@
+<style scoped>
+</style>
 <template>
-  <p>
+  <div>
     <Line :options="options" :data="data" :key="data.labels.length" />
-  </p>
+  </div>
 </template>
 
 <!--<script setup>-->
@@ -42,8 +44,22 @@ export default {
     const options = ref({
       responsive: true,
       spanGaps: true,
+      devicePixelRatio: 2,
       plugins: {
+        legend: {
+          labels: {
+            font: {
+              size: 20,
+            },
+          },
+        },
         tooltip: {
+          titleFont: {
+            size: 16,
+          },
+          bodyFont: {
+            size: 14,
+          },
           callbacks: {
             title: function (context) {
               return "Session " + context[0].label;
@@ -69,6 +85,9 @@ export default {
           title: {
             text: "Rating",
             display: true,
+            font: {
+              size: 16,
+            },
           },
           max: 10,
           min: 0,
@@ -77,6 +96,9 @@ export default {
           title: {
             text: "Session",
             display: true,
+            font: {
+              size: 16,
+            },
           },
           min: 0,
         },
