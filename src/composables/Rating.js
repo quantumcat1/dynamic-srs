@@ -13,7 +13,7 @@ const ratings = reactive(new Map());
 //ratings keys = object of (scale = the scale index, index = the session number)
 //ratings left and right are the index of the rating to the immediate left and right of it
 
-//TODO! NOTE! Surely rating index can be equal to session index??? There should only be one rating added per scale per session ---- Think about this and fix later when done everything else
+//TODO: A bug: sometimes doing much worse/much better results in the new rating being placed over the right-hand one, but the right-hand one not moving.
 
 sessions.set(0, {sessionNote: "test session note"});
 sessions.set(1, {sessionNote: ""});
@@ -178,9 +178,21 @@ export function useRating() {
     //scaleIndex, leftMost, rightMost are integer indices
     //isMuchBetter, isMuchWorse are booleans
 
-    var leftRating = leftMost >= 0 ? getScaleRating(scaleIndex, leftMost) : {fraction: {n: 0, d: 1}};
-    var rightRating = rightMost >= 0 ? getScaleRating(scaleIndex, rightMost) : {fraction: {n: 1, d: 1}};
+    var leftRating = {fraction: {n: 0, d: 1}};
+    var rightRating = {fraction: {n: 1, d: 1}};
 
+    if(leftMost >= 0) {
+      leftRating = getScaleRating(scaleIndex, leftMost);
+    } else {
+      //we have a rightmost but no leftmost - can only be 'much worse' can't be 'much better'
+      isMuchBetter = false;
+    }
+    if(rightMost >= 0) {
+      rightRating = getScaleRating(scaleIndex, rightMost);
+    } else {
+      //we have a leftmost but no rightmost - can only be 'much better' can't be 'much worse'
+      isMuchWorse = false;
+    }
 
 
     if(leftMost == rightMost) { //picked 'similar'
